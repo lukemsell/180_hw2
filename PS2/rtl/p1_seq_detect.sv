@@ -109,19 +109,32 @@ module p1_seq_detect (
 
     case (state_q)
       S_IDLE: begin
-        // <-- fill in
+        if (bit_i == 1'b1)
+          state_d = S_1;
+        else
+          state_d = S_IDLE;
       end
 
       S_1: begin
-        // <-- fill in
+        if (bit_i == 1'b1)
+          state_d = S_11;
+        else
+          state_d = S_IDLE;
       end
 
       S_11: begin
-        // <-- fill in
+        if (bit_i == 1'b0)
+          state_d = S_110;
+        else
+          state_d = S_11;
       end
 
       S_110: begin
-        // <-- fill in
+        if (bit_i == 1'b1) begin
+          state_d = S_1;
+          found_o = 1'b1;
+        end else
+          state_d = S_IDLE;
       end
 
       default: begin
@@ -135,7 +148,10 @@ module p1_seq_detect (
   // Two lines.
   // --------------------------------------------------------------------------
   always_ff @(posedge clk_i) begin
-    // <-- fill in
+    if (!rst_ni)
+      state_q <= S_IDLE;
+    else
+      state_q <= state_d;
   end
 
   // --------------------------------------------------------------------------
@@ -155,7 +171,12 @@ module p1_seq_detect (
     if (!rst_ni) begin
       count_q <= '0;
     end
-    // <-- fill in: increment on found_o, saturating at 8'hFF
+    else if (found_o) begin
+      if (count_q == 8'hFF)
+        count_q <= 8'hFF;
+      else
+        count_q <= count_q + 1'b1;
+    end
   end
 
   assign count_o = count_q;
